@@ -84,7 +84,7 @@ python -m unittest discover -s tests -t .
 
 `runs/detect/train` (100 에폭, YOLOv8n) 기준입니다.
 
-| 정밀도 | 재현율 | mAP50 | mAP50-95 |
+| 정밀도 | 재현율 | mAP@0.5 | mAP@0.5:0.95 |
 |---|---|---|---|
 | 0.969 | 0.988 | 0.993 | 0.642 |
 

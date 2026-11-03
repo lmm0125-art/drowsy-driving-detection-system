@@ -1,4 +1,6 @@
-# 졸업 프로젝트 — Drowsy driving detection
+# 졸업운전감지시스템 — Drowsy driving detection system
+
+Graduation project (졸업 프로젝트), Hanyang University ERICA.
 
 Detection and warning system for driver fatigue. A YOLO detector reads eye and
 mouth states frame by frame; a fatigue rule turns the detections into a warning

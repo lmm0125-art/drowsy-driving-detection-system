@@ -8,12 +8,17 @@ rule turns those detections into a warning.
 Four classes: `closed_eye`, `closed_mouth`, `open_eye`, `open_mouth`.
 
 ```
-frame ──► YOLO (4 states) ──► fatigue counter ──► alert
+frame ──► YOLO (4 states) ──► fatigue rule ──► alert (speech / beep)
+                                   │
+                              sliding window
 ```
 
 ## Repository contents
 
 ```
+app.py                         desktop application: camera, video, still image
+fatigue.py                     the fatigue rule, independent of UI and model
+tests/test_fatigue_rule.py     nine unit tests for the rule (no camera needed)
 data/data.yaml                 class definition and dataset paths
 data/images/                   a few sample frames
 train.py                       training entry point (Ultralytics)
@@ -24,12 +29,34 @@ runs/detect/train2/            a shorter 18-epoch run, kept for comparison
 runs/detect/val/               PR / F1 curves, confusion matrices, prediction batches
 ```
 
-## Training
+## Running the application
 
 ```bash
 pip install -r requirements.txt
 pip install ultralytics
 
+python app.py --model runs/detect/train/weights/best.pt            # pick a source in the UI
+python app.py --model best.pt --source 0                            # default camera
+python app.py --model best.pt --source drive.mp4                    # a recorded clip
+python app.py --model best.pt --source drive.mp4 --threshold 5       # more sensitive
+```
+
+The window shows the annotated frame, the current verdict and how many of the
+last ten frames were drowsy. The warning is spoken through `pyttsx3`; pass
+`--no-voice` to fall back to a system beep.
+
+| option | meaning |
+|---|---|
+| `--model` | path to the trained weights (default `runs/detect/train/weights/best.pt`) |
+| `--source` | `0` for the default camera, or a path to a video |
+| `--window` | frames in the sliding window (default 10) |
+| `--threshold` | drowsy frames inside the window that trigger the warning (default 6) |
+| `--confidence` | detection confidence threshold (default 0.35) |
+| `--no-voice` | beep instead of speaking |
+
+## Training
+
+```bash
 # point data/data.yaml at your local copy of the dataset, then:
 python train.py
 python val.py
@@ -38,11 +65,22 @@ python val.py
 The dataset itself is not distributed here; `data/data.yaml` uses relative paths
 and must be edited to match where the images live.
 
-Fatigue rule used in the evaluation:
+## The fatigue rule
 
-* single image — a closed eye **or** an open mouth counts as fatigue;
-* video or camera — count closed-eye and open-mouth frames in a sliding window
-  of 10 frames; above a threshold the driver is flagged as fatigued.
+`fatigue.py` holds the rule on its own, so it can be tested without a camera, a
+model or a display:
+
+```bash
+python -m unittest discover -s tests -t .
+```
+
+* a still image is flagged as soon as a closed eye **or** an open mouth is
+  detected — there is no temporal context to lean on;
+* a stream counts drowsy frames inside a sliding window and fires when the count
+  reaches the threshold, which tolerates ordinary blinks and swallows.
+
+With the defaults (6 of the last 10 frames) a single blink or yawn cannot raise
+the alarm; sustained closure does.
 
 ## Results
 
@@ -58,5 +96,4 @@ curves and confusion matrices are in `runs/detect/val/`.
 ## Notes
 
 * Model weights (`*.pt`) are not committed — regenerate them with `train.py`.
-* The desktop application used for the live demo is not part of this repository.
 * Presentation slides are not part of this repository.

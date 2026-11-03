@@ -1,0 +1,12 @@
+# point these at your local copy of the dataset
+# (not distributed with this repository)
+train: ../datasets/images/train
+val: ../datasets/images/val
+
+
+##/datasets/dataset/images/test
+# number of classes
+nc: 4
+
+# class names
+names: ['closed_eye', 'closed_mouth', 'open_eye', 'open_mouth']

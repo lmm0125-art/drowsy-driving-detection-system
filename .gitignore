@@ -1,0 +1,19 @@
+# macOS / Windows
+.DS_Store
+desktop.ini
+Thumbs.db
+
+# editors
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+
+# model weights and presentation files stay local
+*.pt
+*.pptx
+
+# training temp
+*.tfevents.*

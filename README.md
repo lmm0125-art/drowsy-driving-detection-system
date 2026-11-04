@@ -35,11 +35,16 @@ runs/detect/val/               PR · F1 곡선, 혼동 행렬, 예측 배치
 pip install -r requirements.txt
 pip install ultralytics
 
-python app.py --model runs/detect/train/weights/best.pt             # 실행 후 화면에서 입력 선택
-python app.py --model best.pt --source 0                            # 기본 카메라
-python app.py --model best.pt --source drive.mp4                    # 저장된 영상
-python app.py --model best.pt --source drive.mp4 --threshold 5       # 더 민감하게
+# 가중치 파일은 저장소에 포함되어 있지 않으므로 경로를 직접 지정해야 합니다
+python app.py --model /path/to/best.pt                             # 실행 후 화면에서 입력 선택
+python app.py --model /path/to/best.pt --source 0                  # 기본 카메라
+python app.py --model /path/to/best.pt --source drive.mp4          # 저장된 영상
+python app.py --model /path/to/best.pt --source drive.mp4 --threshold 5
 ```
+
+가중치가 없으면 `python train.py`로 학습하거나 Ultralytics 공개 체크포인트를
+내려받아 `--model`에 지정하세요. `--model` 없이 실행하면 안내 메시지를 출력하고
+종료됩니다.
 
 화면에는 검출 결과가 그려진 프레임, 현재 판정, 최근 프레임 중 몇 개가 피로로
 판정됐는지가 함께 표시됩니다. 경고는 `pyttsx3`로 음성 출력되며, `--no-voice`를
@@ -47,7 +52,7 @@ python app.py --model best.pt --source drive.mp4 --threshold 5       # 더 민�
 
 | 옵션 | 설명 |
 |---|---|
-| `--model` | 학습된 가중치 경로 (기본값 `runs/detect/train/weights/best.pt`) |
+| `--model` | 학습된 가중치 경로 (필수, 저장소에는 가중치 미포함) |
 | `--source` | `0`이면 기본 카메라, 그 외에는 동영상 파일 경로 |
 | `--window` | 슬라이딩 윈도우 크기, 프레임 단위 (기본 10) |
 | `--threshold` | 윈도우 안에서 경고를 띄우는 피로 프레임 수 (기본 6) |
